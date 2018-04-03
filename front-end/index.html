@@ -1,84 +1,84 @@
 <html>
-	<style>
-		body {
-			background-color: black;
-			color: #bbbbbb;
-			font-family:"Arial";
-		}
-		h1 {
-			text-align:center;
-		}
-		table {
-			text-align: center;
-			border-color: #222222;
-			margin-left: auto;
-			margin-right: auto;
-		}
-		td, tr {
-			padding: 5px 5px 5px 5px;
-			border-color: #222222;
-		}
-		th {
-			color: #dddddd;
-			min-width: 100px;
-		}
-	</style>
-	<head>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	</head>
-	<body>
-		<h1>Ranking de "dificuldade" dos problemas de MC521/MC721</h1>
-		<script>
-			$.get("http://104.131.52.230/all", function (data) {
-			    //console.log(data);
+    <style>
+        body {
+            background-color: black;
+            color: #bbbbbb;
+            font-family:"Arial";
+        }
+        h1 {
+            text-align:center;
+        }
+        table {
+            text-align: center;
+            border-color: #222222;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        td, tr {
+            padding: 5px 5px 5px 5px;
+            border-color: #222222;
+        }
+        th {
+            color: #dddddd;
+            min-width: 100px;
+        }
+    </style>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>Ranking de "dificuldade" dos problemas de MC521/MC721</h1>
+        <script>
+            $.get("http://104.131.52.230/all", function (data) {
+                //console.log(data);
 
-			    // Builds the HTML Table out of myList.
-			    function buildHtmlTable(selector, columns) {
-			      addAllColumnHeaders(data, selector, columns);
-			      for (var i = 0; i < data.length; i++) {
-				var row$ = $('<tr/>');
-				for (var colIndex = 0; colIndex < columns.length; colIndex++) {
-				  var column = columns[colIndex];
-				  if (column === 'fullName') {
-					  continue;
-				  }
-				  if (column !== 'accepted') {
-					  var cellValue = data[i][column];
-					  if (cellValue == null) cellValue = "";
-					  else if (cellValue.length !== undefined && cellValue.join !== undefined) cellValue = cellValue.join();
-					  row$.append($('<td/>').html(cellValue));
-				  } else {
-					  var cellValue = data[i][column];
-					  if (cellValue == null) cellValue = "";
-					  else cellValue = cellValue.length;
-					  row$.append($('<td/>').html(cellValue));
-				  }
-				}
-				$(selector).append(row$);
-			      }
-			    }
+                // Builds the HTML Table out of myList.
+                function buildHtmlTable(selector, columns) {
+                    addAllColumnHeaders(data, selector, columns);
+                    for (var i = 0; i < data.length; i++) {
+                        var row$ = $('<tr/>');
+                        for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+                            var column = columns[colIndex];
+                            if (column !== 'accepted') {
+                                var cellValue = data[i][column];
+                                if (cellValue == null) cellValue = "";
+                                else if (cellValue.length !== undefined && cellValue.join !== undefined) cellValue = cellValue.join();
+                                if (column == 'name') {
+                                    cellValue = '<a href=\"https://www.codepit.io/#/problems/' + data[i]['_id'] + '/view\">' + cellValue + '</a>';
+                                }
+                                row$.append($('<td/>').html(cellValue));
+                            } else {
+                                var cellValue = data[i][column];
+                                if (cellValue == null) cellValue = "";
+                                else cellValue = cellValue.length;
+                                row$.append($('<td/>').html(cellValue));
+                            }
+                        }
+                        $(selector).append(row$);
+                    }
+                }
 
-			    // Adds a header row to the table and returns the set of columns.
-			    // Need to do union of keys from all records as some records may not contain
-			    // all records.
-			    function addAllColumnHeaders(data, selector, columns) {
-			      var columnSet = [];
-			      var headerTr$ = $('<tr/>');
+                // Adds a header row to the table and returns the set of columns.
+                // Need to do union of keys from all records as some records may not contain
+                // all records.
+                function addAllColumnHeaders(data, selector, columns) {
+                    var columnSet = [];
+                    var headerTr$ = $('<tr/>');
 
-				for (let key of columns) {
-				  var k = key;
-				  if ($.inArray(k, columnSet) == -1) {
-				    columnSet.push(k);
-				    headerTr$.append($('<th/>').html(k));
-				  }
-				}
-			      $(selector).append(headerTr$);
-			    }
+                    for (let key of columns) {
+                        var k = key;
+                        if ($.inArray(k, columnSet) == -1) {
+                            columnSet.push(k);
+                            headerTr$.append($('<th/>').html(k));
+                        }
+                    }
+                    $(selector).append(headerTr$);
+                }
 
-			    buildHtmlTable('#rankingTable', ['position', 'name', 'accepted', 'memorylimit', 'timelimit']);
-			});
-		</script>
+                buildHtmlTable('#rankingTable', ['position', 'name', 'accepted', 'memorylimit', 'timelimit']);
+            });
+        </script>
 
-		<div><table id="rankingTable" border="1"></table></div>
-	</body>
+        <div><table id="rankingTable" border="1"></table></div>
+    </body>
 </html>
