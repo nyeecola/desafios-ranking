@@ -21,11 +21,17 @@ from operator import itemgetter
 from flask import Flask, request, jsonify, make_response
 
 global_problems_sorted = []
+global_id_to_user = {}
+global_team_id_to_user = {}
+global_user_solved = {}
 
 TIMER = 60 * 30
 
 def initialize():
     global global_problems_sorted
+    global global_id_to_user
+    global global_user_solved
+    global global_team_id_to_user
     problems_data = {}
 
     files = []
@@ -39,9 +45,22 @@ def initialize():
             with open('./resources/' + f) as data_from_file:
                 metadata = json.load(data_from_file)
                 for problem in metadata['problems']:
-                    problem['accepted'] = []                    # list of unique people who were accepted
+                    problem['accepted'] = []                    # list of unique people who were accepted by id
                     #problem['rejected'] = []                   # TODO: think about this
                     problems_data[problem['_id']] = problem
+                for contestant in metadata['contestants']:
+                    uname = contestant["id"]["local"]["username"]
+                    if uname not in global_user_solved:
+                        global_user_solved[uname] = []
+                    global_id_to_user[contestant["id"]["_id"]] = uname
+                    if "team" in contestant:
+                        tid = contestant["team"]["_id"]
+                        if tid not in global_team_id_to_user:
+                            global_team_id_to_user[tid] = []
+                        global_team_id_to_user[tid].append(uname)
+                        
+    #print(global_user_solved)
+    #print(global_id_to_user)
                        
     # then process the results now that we have all the problems mapped
     for f in files:
@@ -54,8 +73,13 @@ def initialize():
                         # TODO; log error, this shouldn't happen
                         continue
                     if parsed_res_data[0] not in problems_data[parsed_res_data[1]]['accepted']:
-                        problems_data[parsed_res_data[1]]['accepted'].append(parsed_res_data[0])
+                        problems_data[parsed_res_data[1]]['accepted'].append(parsed_res_data[0]) # store user id
                         #print('Problem ' + parsed_res_data[1] + ' solved by ' + parsed_res_data[0]) # DEBUG
+                        if parsed_res_data[0] not in global_id_to_user: # if it is a team, not a user
+                            for u in global_team_id_to_user[parsed_res_data[0]]:
+                                global_user_solved[u].append(parsed_res_data[1]) # map user to problem
+                        else: # if it is a user, not a team
+                            global_user_solved[global_id_to_user[parsed_res_data[0]]].append(parsed_res_data[1]) # map user to problem
 
     # sort data using number of accepted results as key
     problems = problems_data.values()
@@ -158,6 +182,13 @@ app = Flask(__name__)
 def all():
     if request.method == 'GET':
         response = jsonify(global_problems_sorted)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
+@app.route('/user/<uname>/solved', methods = ['GET'])
+def user_solved(uname):
+    if request.method == 'GET':
+        response = jsonify(global_user_solved[uname])
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
