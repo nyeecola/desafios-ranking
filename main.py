@@ -7,9 +7,9 @@
 #
 # TODOs
 #
-# - Add more information to each data, example: which week it was from, a link to its description, etc
-# - Improve front-end
 # - Add position shifting information
+# - Add problem starting date
+# - Clean up code
 #
 
 import requests
