@@ -161,11 +161,12 @@ def all():
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
+# TODO: uncomment this, but add some kind of safety against spammers
 @app.route('/update', methods = ['PUT'])
 def update():
     if request.method == 'PUT':
-        fetch_contests_data()
-        initialize()
+        #fetch_contests_data()
+        #initialize()
         response = make_response()
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
