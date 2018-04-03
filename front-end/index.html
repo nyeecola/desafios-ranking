@@ -29,7 +29,7 @@
 	<body>
 		<h1>Ranking de "dificuldade" dos problemas de MC521/MC721</h1>
 		<script>
-			$.get("http://104.131.52.230:5000/all", function (data) {
+			$.get("http://104.131.52.230/all", function (data) {
 			    //console.log(data);
 
 			    // Builds the HTML Table out of myList.
@@ -75,7 +75,7 @@
 			      $(selector).append(headerTr$);
 			    }
 
-			    buildHtmlTable('#rankingTable', ['_id', 'name', 'accepted', 'memorylimit', 'timelimit']);
+			    buildHtmlTable('#rankingTable', ['position', 'name', 'accepted', 'memorylimit', 'timelimit']);
 			});
 		</script>
 

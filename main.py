@@ -7,8 +7,6 @@
 #
 # TODOs
 #
-# - Fetch new contests automagically
-# - Update data periodically
 # - Add more information to each data, example: which week it was from, a link to its description, etc
 # - Improve front-end
 # - Add position shifting information
@@ -17,11 +15,14 @@
 import requests
 import json
 import os
+import threading
 from tabulate import tabulate
 from operator import itemgetter
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 
 global_problems_sorted = []
+
+TIMER = 60 * 30
 
 def initialize():
     global global_problems_sorted
@@ -60,10 +61,19 @@ def initialize():
     problems = problems_data.values()
     problems = sorted(problems, key=lambda k: len(k['accepted']))
 
-    global_problems_sorted = problems
-    print('DEBUG')
+    position = 0;
+    total_position = 0;
+    len_accepted = -1;
+    for p in problems:
+        total_position += 1
+        l = len(p['accepted'])
+        if l != len_accepted:
+            len_accepted = l
+            position = total_position
+        p['position'] = position 
 
-    """
+    global_problems_sorted = problems
+
     # we now filter some data from the response
     table_data = []
     for problem in problems:
@@ -74,7 +84,7 @@ def initialize():
         if "timelimit" in problem:
             timelimit = problem['timelimit']
         table_data.append([
-            problem['_id'],
+            problem['position'],
             problem['name'],
             len(problem['accepted']),
             memlimit,
@@ -82,9 +92,8 @@ def initialize():
         ])
 
     # and print it in a fancy table way :)
-    table_header = ["ID", "Name", "# of Accepted", "Mem. limit", "Time limit"]
+    table_header = ["Position", "Name", "# of Accepted", "Mem. limit", "Time limit"]
     print(tabulate(table_data, table_header))
-    """
 
 def fetch_contests_data():
     CODEPIT_LOGIN_URL = "https://www.codepit.io/api/v1/user/login"
@@ -113,11 +122,14 @@ def fetch_contests_data():
 
     SCORE_URL_TEMPLATE = "https://www.codepit.io/api/v1/contest/%s/metadata"
     RESULTS_URL_TEMPLATE = "https://www.codepit.io/api/v1/contest/%s/events/0"
+    JOINED_CONTESTS_URL = "https://www.codepit.io/api/v1/contest/list/joined/0"
 
-    # TODO: move this to a configuration file (maybe fetch programatically for all problems I've entered?)
-    placar_ids = ['5ab156d701a96e001940764f', '5aa6e07d80cd12006c997f4f', '5a9e754dbebc010018a6a353', '5a9800d8636fa800962e51e7', '5abddfc6636fa800962e6a86']
+    # fetch all contests I've ever joined in this account
+    print("Fetching contests...")
+    joined_contests_req = session.get(JOINED_CONTESTS_URL)
+    placar_ids = [c["_id"] for c in joined_contests_req.json()['contests']]
 
-    print("Fetching contests data...")
+    print("Fetching problems...")
     for pid in placar_ids:
         req_get = session.get(SCORE_URL_TEMPLATE % pid)
         score_data = req_get.json()
@@ -132,21 +144,34 @@ def fetch_contests_data():
             json.dump(results_data, outfile)
 
 
+def update_and_process():
+    global TIMER
+    fetch_contests_data()
+    initialize()
+    threading.Timer(TIMER, update_and_process).start() # call itself later
+
+
 # WebServer
 app = Flask(__name__)
 
 @app.route('/all', methods = ['GET'])
-def result():
+def all():
     if request.method == 'GET':
         response = jsonify(global_problems_sorted)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
+@app.route('/update', methods = ['PUT'])
+def update():
+    if request.method == 'PUT':
+        fetch_contests_data()
+        initialize()
+        response = make_response()
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
 
 if __name__ == "__main__":
-    #fetch_contests_data()
-    #print('a')
-    initialize()
-    #print('b')
-    app.run(host = '0.0.0.0', debug = True)
+    update_and_process()
+    app.run(host='0.0.0.0', port=5000, debug=False)
 
