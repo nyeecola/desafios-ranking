@@ -40,9 +40,22 @@
     </head>
     <body>
         <h1>Ranking de "dificuldade" dos problemas de MC521/MC721</h1>
+
+        <div style="text-align: center; margin-bottom: 10px;"><input type="text" id="userInput"></input><button id="checkUser">Check</button></div>
+        <div><table id="rankingTable" border="1"></table></div>
+
         <script>
+            var ordered_ids = {};
+
             $.get("http://104.131.52.230/all", function (data) {
                 //console.log(data);
+
+                ordered_ids = {};
+                var idx = 0;
+                for (let p of data) {
+                    ordered_ids[p._id] = idx;
+                    idx++;
+                }
 
                 // Builds the HTML Table out of myList.
                 function buildHtmlTable(selector, columns) {
@@ -89,8 +102,23 @@
 
                 buildHtmlTable('#rankingTable', ['position', 'name', 'accepted', 'memorylimit', 'timelimit']);
             });
-        </script>
 
-        <div><table id="rankingTable" border="1"></table></div>
+            $("#checkUser").click(function() {
+                var userName = $("#userInput").val();
+                if (userName !== null) {
+                    $.get('http://104.131.52.230/user/'+userName+'/solved', function (data) {
+                        if (data !== null && data !== undefined) {
+                            var element = document.getElementById('rankingTable');
+                            for (var i = 0; i < element.rows.length; i++) {
+                                element.rows[i].style.backgroundColor = "black";
+                            }
+                            for (let p of data) {
+                                element.rows[ordered_ids[p]+1].style.backgroundColor = "#333333";
+                            }
+                        }   
+                    });
+                }
+            });
+        </script>
     </body>
 </html>

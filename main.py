@@ -188,9 +188,12 @@ def all():
 @app.route('/user/<uname>/solved', methods = ['GET'])
 def user_solved(uname):
     if request.method == 'GET':
-        response = jsonify(global_user_solved[uname])
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return response
+        if uname in global_user_solved:
+            response = jsonify(global_user_solved[uname])
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        else:
+            response = make_response('No user with the given name was found.')
 
 # TODO: uncomment this, but add some kind of safety against spammers
 @app.route('/update', methods = ['PUT'])
