@@ -27,6 +27,12 @@ This file must be placed on the same directoty as `main.py`.
 
 ## Usage
 
+Now, we can test the server on our local machine. Let's start it!
+```bash
+$ python3 main.py
+```
+Some log will print on your terminal and the server will start running.
+
 ## Contributing
 
 ## Credits
