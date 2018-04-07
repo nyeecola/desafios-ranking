@@ -1,0 +1,34 @@
+body {
+    background-color: black;
+    color: #bbbbbb;
+    font-family:"Arial";
+}
+h1 {
+    text-align:center;
+}
+table {
+    text-align: center;
+    border-color: #222222;
+    margin-left: auto;
+    margin-right: auto;
+}
+td, tr {
+    padding: 5px 5px 5px 5px;
+    border-color: #222222;
+}
+th {
+    color: #dddddd;
+    min-width: 100px;
+}
+a:link {
+    color: #bbbbbb;
+}
+a:visited {
+    color: #bbbbbb;
+}
+a:hover {
+    color: #aaaacc;
+}
+a:active {
+    color: #aaaacc;
+} 
