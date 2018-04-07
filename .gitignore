@@ -1,1 +1,4 @@
+# we dont want our password on github.com, right?
 credentials.txt
+
+resources/*
