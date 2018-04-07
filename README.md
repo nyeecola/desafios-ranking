@@ -48,4 +48,4 @@ This isn't quite an ambitious project, but you are free to fork it, make cool ch
 
 ## License
 
-MIT License
+[MIT License](https://github.com/andrealmeid/desafios-ranking/blob/master/LICENSE)
