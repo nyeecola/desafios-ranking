@@ -31,10 +31,21 @@ Now, we can test the server on our local machine. Let's start it!
 ```bash
 $ python3 main.py
 ```
-Some log will print on your terminal and the server will start running.
+Some log will print on your terminal and the server will start running on the address `http://0.0.0.0:5000/`. Check in your browser the address `http://0.0.0.0:5000/all`, and it should print a big json. This is our API retriving data from codepit :)
+
+Now you need to open `/local-path/desafios-ranking/front-end/index.html` on your broswer as well. Don't forget to replace `/local-path/` with the path where you cloned this repo.
+
+If everything just went fine, you can see now the score board on your browser.
 
 ## Contributing
 
+This isn't quite an ambitious project, but you are free to fork it, make cool changes and send a pull request with new features that you think would improve the project.
+
 ## Credits
 
+- [Italo Nicola](https://github.com/nyeecola)
+- [André Almeida](https://github.com/andrealmeid)
+
 ## License
+
+MIT License
